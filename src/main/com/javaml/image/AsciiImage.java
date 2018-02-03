@@ -12,11 +12,11 @@ public class AsciiImage {
         }
     }
 
-    public getPixel(Integer x, Integer y) {
-        // TODO: implement
+    public Character getPixel(Integer x, Integer y) {
+        return pixels.get(x).get(y);
     }
 
-    public setPixel(Character pixel, Integer x, Integer y) {
-        // TODO: implement
+    public void setPixel(Character pixel, Integer x, Integer y) {
+        pixels.get(x).set(y, pixel);
     }
 }
