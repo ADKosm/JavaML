@@ -11,4 +11,12 @@ public class AsciiImage {
             pixels.set(i, new ArrayList<>(width));
         }
     }
+
+    public getPixel(Integer x, Integer y) {
+        // TODO: implement
+    }
+
+    public setPixel(Character pixel, Integer x, Integer y) {
+        // TODO: implement
+    }
 }
