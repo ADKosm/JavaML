@@ -9,9 +9,9 @@ public class AsciiImage {
     private ArrayList<ArrayList<Character>> pixels;
 
     public AsciiImage(Integer height, Integer width) {
-        this.pixels = new ArrayList<>(height);
+        pixels = new ArrayList<>(height);
         for (int i = 0; i < height; i++) {
-            this.pixels.add(new ArrayList<>(Collections.nCopies(width, ' ')));
+            pixels.add(new ArrayList<>(Collections.nCopies(width, ' ')));
         }
     }
 
