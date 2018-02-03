@@ -45,7 +45,7 @@ public class SimpleImageConverter implements ImageConverter {
         Integer green = (pixel >>>  8) & 0xFF;
         Integer blue  = (pixel >>>  0) & 0xFF;
 
-        Float luminance = 1.0f - (red * 0.2126f + green * 0.7152f + blue * 0.0722f) / 255;
+        Float luminance = (red * 0.2126f + green * 0.7152f + blue * 0.0722f) / 255;
         Float paletteRange = (float) (palette.length - 1);
 
         Integer position = (int) (paletteRange * luminance + 0.5f);

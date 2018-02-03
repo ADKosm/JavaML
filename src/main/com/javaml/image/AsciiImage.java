@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class AsciiImage {
-    public static char[] C_Palette = "   ...',;:clodxkO0KXNWM".toCharArray();
+    public static char[] C_Palette = "      ',;:clodxkO0KXNWM".toCharArray();
 
     private ArrayList<ArrayList<Character>> pixels;
     private Integer height;
@@ -29,7 +29,7 @@ public class AsciiImage {
     }
 
     public Character getPixel(Integer x, Integer y) {
-        return pixels.get(x).get(y);
+        return pixels.get(y).get(x);
     }
 
     public void setPixel(Character pixel, Integer x, Integer y) {
