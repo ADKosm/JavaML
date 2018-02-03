@@ -99,4 +99,20 @@ public class LogisticBinaryClassifier implements BinaryClassifier {
         }
         return res;
     }
+
+    @Override
+    public Double predict_proba(Tensor<Number> test) {
+        return predict_(test);
+    }
+
+    @Override
+    public List<Double> predict_proba(List<Tensor<Number>> test)
+            throws TensorSizeException, UnmatchedTensorSizesException {
+        checkInput(test);
+        List<Double> res = new ArrayList<>(test.size());
+        for (Tensor<Number> tensor : test) {
+            res.add(predict_proba(tensor));
+        }
+        return res;
+    }
 }

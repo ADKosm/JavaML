@@ -14,4 +14,8 @@ public interface BinaryClassifier {
     Boolean predict(Tensor<Number> test);
 
     List<Boolean> predict(List<Tensor<Number>> test) throws TensorSizeException, UnmatchedTensorSizesException;
+
+    Double predict_proba(Tensor<Number> test);
+
+    List<Double> predict_proba(List<Tensor<Number>> test) throws TensorSizeException, UnmatchedTensorSizesException;
 }
