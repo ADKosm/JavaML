@@ -55,11 +55,11 @@ public class LogisticBinaryClassifier implements BinaryClassifier {
     }
 
     public LogisticBinaryClassifier(Integer iterationNumber) {
-        new LogisticBinaryClassifier(iterationNumber, 0.7, 0.5);
+        this(iterationNumber, 0.7, 0.5);
     }
 
     public LogisticBinaryClassifier(Integer iterationNumber, Double learningRate) {
-        new LogisticBinaryClassifier(iterationNumber, learningRate, 0.5);
+        this(iterationNumber, learningRate, 0.5);
     }
 
     public LogisticBinaryClassifier(Integer iterationNumber, Double learningRate, Double classificationThreshold) {
@@ -74,6 +74,9 @@ public class LogisticBinaryClassifier implements BinaryClassifier {
         this.tensorSize = getTensorSize(train.get(0));
         checkInput(train, labels);
         this.weights = new ArrayList<>(this.tensorSize);
+        for (int i = 0; i < this.tensorSize; i++) {
+            this.weights.add(0.0);
+        }
         // TODO: implement break criterion
         for (int n = 0; n < this.iterationNumber; n++) {
 
