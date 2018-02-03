@@ -3,8 +3,10 @@ package com.javaml;
 import com.javaml.converter.ImageConverter;
 import com.javaml.converter.SimpleImageConverter;
 import com.javaml.image.AsciiImage;
+import com.javaml.segmentation.segmenter.LinearSegmenter;
 
 import javax.imageio.ImageIO;
+import javax.sound.sampled.Line;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
