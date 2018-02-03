@@ -1,9 +1,9 @@
 package com.javaml.ml;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public interface Tensor<T> {
-    ArrayList<Integer> getShape();
+    List<Integer> getShape();
 
     T getElement(Integer ordinal);
 }
