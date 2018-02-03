@@ -7,12 +7,25 @@ public class AsciiImage {
     public static char[] C_Palette = "   ...',;:clodxkO0KXNWM".toCharArray();
 
     private ArrayList<ArrayList<Character>> pixels;
+    private Integer height;
+    private Integer width;
 
     public AsciiImage(Integer height, Integer width) {
+        this.height = height;
+        this.width = width;
+
         pixels = new ArrayList<>(height);
         for (int i = 0; i < height; i++) {
             pixels.add(new ArrayList<>(Collections.nCopies(width, ' ')));
         }
+    }
+
+    public Integer getHeight() {
+        return height;
+    }
+
+    public Integer getWidth() {
+        return width;
     }
 
     public Character getPixel(Integer x, Integer y) {
@@ -21,6 +34,17 @@ public class AsciiImage {
 
     public void setPixel(Character pixel, Integer x, Integer y) {
         pixels.get(y).set(x, pixel);
+    }
+
+    public AsciiImage getCrop(Integer lx, Integer ly, Integer rx, Integer ry) {
+        AsciiImage result = new AsciiImage(ry - ly, rx - lx);
+        for(int x = 0; x < result.getWidth(); x++) {
+            for(int y = 0; y < result.getHeight(); y++) {
+                Character pixel = getPixel(lx + x, ly + y);
+                result.setPixel(pixel, x, y);
+            }
+        }
+        return result;
     }
 
     public String toString() {
