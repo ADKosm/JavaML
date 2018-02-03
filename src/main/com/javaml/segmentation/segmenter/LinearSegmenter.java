@@ -4,8 +4,13 @@ import com.javaml.image.AsciiImage;
 import com.javaml.segmentation.backgroundFetcher.BackgroundFetcher;
 import com.javaml.segmentation.backgroundFetcher.FirstBackgroundFetcher;
 import com.javaml.segmentation.backgroundFetcher.ModeBackgroundFetcher;
+import com.javaml.segmentation.garbageFilter.CompositeGarbageFilter;
+import com.javaml.segmentation.garbageFilter.GarbageFilter;
+import com.javaml.segmentation.garbageFilter.SizeGarbageFilter;
+import com.javaml.segmentation.garbageFilter.WeightGarbageFilter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -15,9 +20,14 @@ public class LinearSegmenter implements Segmenter {
     private enum Axis {X, Y};
 
     private BackgroundFetcher fetcher;
+    private GarbageFilter filter;
 
     public LinearSegmenter() {
         fetcher = new ModeBackgroundFetcher();
+        filter = new CompositeGarbageFilter(Arrays.asList(
+                new SizeGarbageFilter(7),
+                new WeightGarbageFilter(0.5f)
+        ));
     }
 
     public LinearSegmenter(BackgroundFetchStrategy strategy) {
@@ -29,6 +39,10 @@ public class LinearSegmenter implements Segmenter {
                 fetcher = new FirstBackgroundFetcher();
                 break;
         }
+        filter = new CompositeGarbageFilter(Arrays.asList(
+                new SizeGarbageFilter(7),
+                new WeightGarbageFilter(0.5f)
+        ));
     }
 
     @Override
@@ -37,8 +51,8 @@ public class LinearSegmenter implements Segmenter {
 
         Character background = fetcher.fetchBackground(image);
 
-        List<Integer> horizontalLines = fetchLines(image, background, Axis.X);
-        List<Integer> verticalLines = fetchLines(image, background, Axis.Y);
+        List<Integer> horizontalLines = fetchLines(image, background, Axis.Y);
+        List<Integer> verticalLines = fetchLines(image, background, Axis.X);
 
         for(int x = 0; x < verticalLines.size(); x++) {
             for(int y = 0; y < horizontalLines.size(); y++) {
@@ -50,7 +64,7 @@ public class LinearSegmenter implements Segmenter {
             }
         }
 
-        return result;
+        return filter.filter(result);
     }
 
     private List<Integer> fetchLines(AsciiImage image, Character background, Axis axis) {
@@ -64,7 +78,7 @@ public class LinearSegmenter implements Segmenter {
         while (cursor < end) {
             if(checkLine(image, cursor, axis, background)) {
                 beginGap = cursor;
-                while (checkLine(image, cursor, axis, background) && cursor < end) cursor++;
+                while (cursor < end && checkLine(image, cursor, axis, background)) cursor++;
                 result.add( (cursor + beginGap) / 2);
             }
             cursor++;
