@@ -49,6 +49,14 @@ public class LogisticBinaryClassifier implements BinaryClassifier {
         return tensor.getShape().stream().reduce(Math::multiplyExact).orElseThrow(TensorSizeException::new);
     }
 
+    public LogisticBinaryClassifier(Integer iterationNumber) {
+        new LogisticBinaryClassifier(iterationNumber, 0.7, 0.5);
+    }
+
+    public LogisticBinaryClassifier(Integer iterationNumber, Double learningRate) {
+        new LogisticBinaryClassifier(iterationNumber, learningRate, 0.5);
+    }
+
     public LogisticBinaryClassifier(Integer iterationNumber, Double learningRate, Double classificationThreshold) {
         this.iterationNumber = iterationNumber;
         this.learningRate = learningRate;
