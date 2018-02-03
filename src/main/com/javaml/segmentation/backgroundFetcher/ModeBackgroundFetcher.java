@@ -9,8 +9,8 @@ import java.util.List;
 public class ModeBackgroundFetcher implements BackgroundFetcher {
     @Override
     public Character fetchBackground(AsciiImage image) {
-        List<Integer> counts = new ArrayList<>(Collections.nCopies(AsciiImage.C_Palette.length, 0));
-        String palette = String.valueOf(AsciiImage.C_Palette);
+        List<Integer> counts = new ArrayList<>(Collections.nCopies(AsciiImage.C_Palette.length(), 0));
+        String palette = AsciiImage.C_Palette;
 
         for(int x = 0; x < image.getWidth(); x++) {
             for(int y = 0; y < image.getHeight(); y++) {
