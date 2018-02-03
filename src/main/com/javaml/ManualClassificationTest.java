@@ -21,7 +21,7 @@ class ManualClassificationTest {
         List<Integer> testLabels = new ArrayList<>();
         int k = 0;
         for (int i = 0; i < 10; i++) {
-            File folder = new File("/home/givorenon/Documents/JavaML/examples/trainingSample/" + i);
+            File folder = new File("/home/givorenon/Documents/trainingSample/" + i);
 
             for (final File file : folder.listFiles()) {
                 BufferedImage image = ImageIO.read(file);
@@ -29,7 +29,7 @@ class ManualClassificationTest {
 
                 AsciiImage asciiImage = converter.Convert(image);
                 k++;
-                if (k % 10 == 0) {
+                if (k % 10 != 0) {
                     train.add(asciiImage);
                     labels.add(i);
                 } else {
@@ -41,6 +41,7 @@ class ManualClassificationTest {
 
         System.out.println(String.format("Training"));
         NaryClassifier c = new LogisticNaryClassifier(100, 0.7, 10);
+
         c.fit(train, labels);
         System.out.println(String.format("Trained"));
 
@@ -52,6 +53,6 @@ class ManualClassificationTest {
                 correct++;
             }
         }
-        System.out.println(String.format("correct: %s, total: %s", correct, test.size()));
+        System.out.println(String.format("correct: %s, total: %s", correct, testLabels.size()));
     }
 }

@@ -6,6 +6,7 @@ import com.javaml.exception.UnmatchedTensorSizesException;
 import com.javaml.ml.Tensor;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class LogisticBinaryClassifier implements BinaryClassifier {
@@ -73,10 +74,8 @@ public class LogisticBinaryClassifier implements BinaryClassifier {
             throws TensorSizeException, UnmatchedTensorAndLabelNumbersException, UnmatchedTensorSizesException {
         this.tensorSize = getTensorSize(train.get(0));
         checkInput(train, labels);
-        this.weights = new ArrayList<>(this.tensorSize);
-        for (int i = 0; i < this.tensorSize; i++) {
-            this.weights.add(0.0);
-        }
+
+        this.weights = new ArrayList<>(Collections.nCopies(this.tensorSize, 0.0));
         // TODO: implement break criterion
         for (int n = 0; n < this.iterationNumber; n++) {
 
