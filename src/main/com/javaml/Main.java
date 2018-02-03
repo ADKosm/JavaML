@@ -12,25 +12,21 @@ import java.io.PrintWriter;
 
 class Main {
     public static void main(String[] args) {
-        String inputPath = args[0];
-        String outputPath = null;
+        String input = args[0];
+        String output = null;
         if(args.length > 1) {
-            outputPath = args[1];
+            output = args[1];
         }
 
         try {
-            BufferedImage image = ImageIO.read(new File(inputPath));
+            BufferedImage image = ImageIO.read(new File(input));
             ImageConverter converter = new SimpleImageConverter(64, 64);
 
             AsciiImage asciiImage = converter.Convert(image);
 
-            if(outputPath == null) {
-                System.out.println(asciiImage);
-            } else {
-                PrintWriter writer = new PrintWriter(outputPath, "UTF-8");
-                writer.println(asciiImage);
-                writer.close();
-            }
+            PrintWriter writer = (output == null) ? new PrintWriter(System.out) : new PrintWriter(output, "UTF-8");
+            writer.println(asciiImage);
+            writer.close();
         } catch (IOException e) {
             System.out.println("Something went wrong: " + e.toString());
             System.exit(1);
