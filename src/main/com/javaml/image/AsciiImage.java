@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class AsciiImage implements Tensor<Integer> {
-    public static String C_Palette = new String("   ...',;:clodxkO0KXNWM".toCharArray());
+    public static String C_Palette = "   ...',;:clodxkO0KXNWM";
 
     private ArrayList<ArrayList<Character>> pixels;
     private Integer width;
