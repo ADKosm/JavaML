@@ -34,7 +34,7 @@ public class LogisticNaryClassifier implements NaryClassifier {
     }
 
     @Override
-    public Integer predict(Tensor<Number> test) {
+    public Integer predict(Tensor<Number> test) throws TensorSizeException, UnmatchedTensorSizesException {
         Double maxProba = 0.0;
         Integer predictedLabel = 0;
         for (int i = 0; i < this.binaryClassifiers.size(); i++) {

@@ -11,7 +11,7 @@ public interface NaryClassifier {
     void fit(List<Tensor<Number>> train, List<Integer> labels) throws TensorSizeException,
             UnmatchedTensorAndLabelNumbersException, UnmatchedTensorSizesException;
 
-    Integer predict(Tensor<Number> test);
+    Integer predict(Tensor<Number> test) throws TensorSizeException, UnmatchedTensorSizesException;
 
     List<Integer> predict(List<Tensor<Number>> test) throws TensorSizeException, UnmatchedTensorSizesException;
 }
