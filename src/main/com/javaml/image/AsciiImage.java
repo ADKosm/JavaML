@@ -7,8 +7,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class AsciiImage implements Tensor<Integer> {
-    public static String C_Palette = "   ...',;:clodxkO0KXNWM";
+public class AsciiImage implements Tensor<Number> {
+    public static String C_Palette = new String("   ...',;:clodxkO0KXNWM".toCharArray());
 
     private ArrayList<ArrayList<Character>> pixels;
     private Integer width;
@@ -46,7 +46,7 @@ public class AsciiImage implements Tensor<Integer> {
         return Arrays.asList(height, width);
     }
 
-    public Integer getElement(Integer ordinal) {
+    public Number getElement(Integer ordinal) {
         Character pixel = getPixel(ordinal / height, ordinal % height);
         return C_Palette.indexOf(pixel);
     }

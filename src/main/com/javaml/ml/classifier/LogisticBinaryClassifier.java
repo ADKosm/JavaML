@@ -6,6 +6,7 @@ import com.javaml.exception.UnmatchedTensorSizesException;
 import com.javaml.ml.Tensor;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class LogisticBinaryClassifier implements BinaryClassifier {
@@ -14,34 +15,39 @@ public class LogisticBinaryClassifier implements BinaryClassifier {
     private Integer iterationNumber;
     private Double learningRate;
     private Double classificationThreshold;
+    private Integer tensorSize;
 
     private static double sigmoid(double x) {
         return 1.0 / (1.0 + Math.exp(-x));
     }
 
-    private double predict_(Tensor<Number> x) {
+    private double predict_(Tensor<Number> tensor) {
         double logit = .0;
-        for (int i=0; i<weights.size();i++)  {
-            logit += weights.get(i) * x.getElement(i).doubleValue();
+        for (int i = 0; i < weights.size(); i++)  {
+            logit += weights.get(i) * tensor.getElement(i).doubleValue();
         }
         return sigmoid(logit);
     }
 
-    private void checkInput(List<Tensor<Number>> train, List<Boolean> labels)
+    private void checkInput(List<Tensor<Number>> tensors, List<Boolean> labels)
             throws TensorSizeException, UnmatchedTensorAndLabelNumbersException, UnmatchedTensorSizesException {
-        if (train.size() != labels.size()) {
+        if (tensors.size() != labels.size()) {
             throw new UnmatchedTensorAndLabelNumbersException();
         }
-        checkInput(train);
+        checkInput(tensors);
     }
 
-    private void checkInput(List<Tensor<Number>> train)
+    private void checkInput(List<Tensor<Number>> tensors)
             throws TensorSizeException, UnmatchedTensorSizesException {
-        Integer tensorSize = getTensorSize(train.get(0));
-        for (Tensor<Number> tensor : train) {
-            if (!tensorSize.equals(getTensorSize(tensor))) {
-                throw new UnmatchedTensorSizesException();
-            }
+        for (Tensor<Number> tensor : tensors) {
+            checkInput(tensor);
+        }
+    }
+
+    private void checkInput(Tensor<Number> tensor)
+            throws TensorSizeException, UnmatchedTensorSizesException {
+        if (!this.tensorSize.equals(getTensorSize(tensor))) {
+            throw new UnmatchedTensorSizesException();
         }
     }
 
@@ -50,11 +56,11 @@ public class LogisticBinaryClassifier implements BinaryClassifier {
     }
 
     public LogisticBinaryClassifier(Integer iterationNumber) {
-        new LogisticBinaryClassifier(iterationNumber, 0.7, 0.5);
+        this(iterationNumber, 0.7, 0.5);
     }
 
     public LogisticBinaryClassifier(Integer iterationNumber, Double learningRate) {
-        new LogisticBinaryClassifier(iterationNumber, learningRate, 0.5);
+        this(iterationNumber, learningRate, 0.5);
     }
 
     public LogisticBinaryClassifier(Integer iterationNumber, Double learningRate, Double classificationThreshold) {
@@ -66,9 +72,10 @@ public class LogisticBinaryClassifier implements BinaryClassifier {
     @Override
     public void fit(List<Tensor<Number>> train, List<Boolean> labels)
             throws TensorSizeException, UnmatchedTensorAndLabelNumbersException, UnmatchedTensorSizesException {
+        this.tensorSize = getTensorSize(train.get(0));
         checkInput(train, labels);
-        Integer tensorSize = getTensorSize(train.get(0));
-        this.weights = new ArrayList<>(tensorSize);
+
+        this.weights = new ArrayList<>(Collections.nCopies(this.tensorSize, 0.0));
         // TODO: implement break criterion
         for (int n = 0; n < this.iterationNumber; n++) {
 
@@ -86,7 +93,8 @@ public class LogisticBinaryClassifier implements BinaryClassifier {
     }
 
     @Override
-    public Boolean predict(Tensor<Number> test) {
+    public Boolean predict(Tensor<Number> test) throws TensorSizeException, UnmatchedTensorSizesException {
+            checkInput(test);
             return predict_(test) > this.classificationThreshold;
     }
 
@@ -96,6 +104,23 @@ public class LogisticBinaryClassifier implements BinaryClassifier {
         List<Boolean> res = new ArrayList<>(test.size());
         for (Tensor<Number> tensor : test) {
             res.add(predict(tensor));
+        }
+        return res;
+    }
+
+    @Override
+    public Double predict_proba(Tensor<Number> test) throws TensorSizeException, UnmatchedTensorSizesException  {
+        checkInput(test);
+        return predict_(test);
+    }
+
+    @Override
+    public List<Double> predict_proba(List<Tensor<Number>> test)
+            throws TensorSizeException, UnmatchedTensorSizesException {
+        checkInput(test);
+        List<Double> res = new ArrayList<>(test.size());
+        for (Tensor<Number> tensor : test) {
+            res.add(predict_proba(tensor));
         }
         return res;
     }
