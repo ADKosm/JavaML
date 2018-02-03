@@ -1,14 +1,17 @@
 package com.javaml.image;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class AsciiImage {
+    public static char[] C_Palette = "   ...',;:clodxkO0KXNWM".toCharArray();
+
     private ArrayList<ArrayList<Character>> pixels;
 
     public AsciiImage(Integer height, Integer width) {
         pixels = new ArrayList<>(height);
         for (int i = 0; i < height; i++) {
-            pixels.set(i, new ArrayList<>(width));
+            pixels.add(new ArrayList<>(Collections.nCopies(width, ' ')));
         }
     }
 
@@ -17,6 +20,17 @@ public class AsciiImage {
     }
 
     public void setPixel(Character pixel, Integer x, Integer y) {
-        pixels.get(x).set(y, pixel);
+        pixels.get(y).set(x, pixel);
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        for(ArrayList<Character> line : pixels) {
+            for(Character pixel : line) {
+                builder.append(pixel);
+            }
+            builder.append('\n');
+        }
+        return builder.toString();
     }
 }
