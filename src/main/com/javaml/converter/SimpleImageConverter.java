@@ -17,7 +17,7 @@ public class SimpleImageConverter implements ImageConverter {
 
     public AsciiImage Convert(BufferedImage bufferedImage) {
         BufferedImage scaledImage = scale(bufferedImage);
-        char[] imagePalette = AsciiImage.C_Palette;
+        String imagePalette = AsciiImage.C_Palette;
 
         AsciiImage asciiImage = new AsciiImage(height, width);
         for(int x = 0; x < width; x++) {
@@ -40,16 +40,16 @@ public class SimpleImageConverter implements ImageConverter {
         return resultImage;
     }
 
-    private Character convertPixel(Integer pixel, char[] palette) {
+    private Character convertPixel(Integer pixel, String palette) {
         Integer red = (pixel >>> 16) & 0xFF;
         Integer green = (pixel >>>  8) & 0xFF;
         Integer blue  = (pixel >>>  0) & 0xFF;
 
         Float luminance = 1.0f - (red * 0.2126f + green * 0.7152f + blue * 0.0722f) / 255;
-        Float paletteRange = (float) (palette.length - 1);
+        Float paletteRange = (float) (palette.length() - 1);
 
         Integer position = (int) (paletteRange * luminance + 0.5f);
 
-        return palette[position];
+        return palette.charAt(position);
     }
 }
