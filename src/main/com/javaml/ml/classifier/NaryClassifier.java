@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface NaryClassifier {
     void fit(List<Tensor<Number>> train, List<Integer> labels) throws TensorSizeException,
-            UnmatchedTensorAndLabelNumbersException, UnmatchedTensorSizesException;
+            UnmatchedTensorAndLabelNumbersException, UnmatchedTensorSizesException, InterruptedException;
 
     Integer predict(Tensor<Number> test) throws TensorSizeException, UnmatchedTensorSizesException;
 
