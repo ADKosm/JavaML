@@ -1,5 +1,7 @@
 package com.javaml.image;
 
+import com.javaml.converting.scaler.NearestNeighborScaler;
+import com.javaml.converting.scaler.Scaler;
 import com.javaml.ml.Tensor;
 
 import java.util.ArrayList;
@@ -9,6 +11,7 @@ import java.util.List;
 
 public class AsciiImage implements Tensor<Number> {
     public static String C_Palette = "      ',;:clodxkO0KXNWM";
+    public enum Axis {X, Y};
 
     private ArrayList<ArrayList<Character>> pixels;
     private Integer height;
@@ -38,6 +41,11 @@ public class AsciiImage implements Tensor<Number> {
 
     public void setPixel(Character pixel, Integer x, Integer y) {
         pixels.get(y).set(x, pixel);
+    }
+
+    public AsciiImage getScaled(Integer newWidth, Integer newHeight) {
+        Scaler scaler = new NearestNeighborScaler();  // TODO: make scale strategy parametrized
+        return scaler.scale(this, newWidth, newHeight);
     }
 
     public AsciiImage getCrop(Integer lx, Integer ly, Integer rx, Integer ry) {

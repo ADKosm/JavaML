@@ -1,7 +1,7 @@
 package com.javaml;
 
-import com.javaml.converter.ImageConverter;
-import com.javaml.converter.SimpleImageConverter;
+import com.javaml.converting.converter.ImageConverter;
+import com.javaml.converting.converter.SimpleImageConverter;
 import com.javaml.image.AsciiImage;
 import com.javaml.ml.Tensor;
 import com.javaml.ml.classifier.LogisticNaryClassifier;

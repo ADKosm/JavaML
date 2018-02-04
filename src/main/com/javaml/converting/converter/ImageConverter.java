@@ -1,4 +1,4 @@
-package com.javaml.converter;
+package com.javaml.converting.converter;
 
 import com.javaml.image.AsciiImage;
 
