@@ -1,49 +1,60 @@
 package com.javaml.ml.classifier;
 
+import com.javaml.concurrent.CheckedFunction;
+import com.javaml.concurrent.ThreadPool;
 import com.javaml.exception.TensorSizeException;
 import com.javaml.exception.UnmatchedTensorAndLabelNumbersException;
 import com.javaml.exception.UnmatchedTensorSizesException;
 import com.javaml.ml.Tensor;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class LogisticNaryClassifier implements NaryClassifier {
 
-    private List<BinaryClassifier> binaryClassifiers;
+    private Collection<BinaryClassifier> binaryClassifiers;
+    private Integer iterationNumber;
+    private Double learningRate;
+    private Integer numberOfLabels;
 
     public LogisticNaryClassifier(Integer iterationNumber, Double learningRate, Integer numberOfLabels) {
-        binaryClassifiers = new ArrayList<>(numberOfLabels);
-        for (int i = 0; i < numberOfLabels; i++) {
-            binaryClassifiers.add(new LogisticBinaryClassifier(iterationNumber, learningRate));
-        }
+        this.iterationNumber = iterationNumber;
+        this.learningRate = learningRate;
+        this.numberOfLabels = numberOfLabels;
     }
 
     @Override
     public void fit(List<Tensor<Number>> train, List<Integer> labels) throws TensorSizeException,
-            UnmatchedTensorAndLabelNumbersException, UnmatchedTensorSizesException {
-        for (int i = 0; i < this.binaryClassifiers.size(); i++) {
+            UnmatchedTensorAndLabelNumbersException, UnmatchedTensorSizesException, InterruptedException {
+        CheckedFunction<Integer, BinaryClassifier> learnClassicier = (Integer i) -> {
             List<Boolean> booleanLabels = new ArrayList<>(labels.size());
-            for (int j = 0; j < labels.size(); j++) {
-                booleanLabels.add(labels.get(j) == i);
+            for (Integer label : labels) {
+                booleanLabels.add(label.equals(i));
             }
-            BinaryClassifier binaryClassifier = binaryClassifiers.get(i);
+            BinaryClassifier binaryClassifier = new LogisticBinaryClassifier(iterationNumber, learningRate);
             binaryClassifier.fit(train, booleanLabels);
-        }
-
+            return binaryClassifier;
+        };
+        ThreadPool threadPool = new ThreadPool(2);
+        binaryClassifiers = threadPool.parallelMap(learnClassicier,
+                IntStream.range(0, numberOfLabels).boxed().collect(Collectors.toList()));
     }
 
     @Override
     public Integer predict(Tensor<Number> test) throws TensorSizeException, UnmatchedTensorSizesException {
         Double maxProba = 0.0;
         Integer predictedLabel = 0;
-        for (int i = 0; i < this.binaryClassifiers.size(); i++) {
-            BinaryClassifier binaryClassifier = binaryClassifiers.get(i);
+        int index = 0;
+        for (BinaryClassifier binaryClassifier : binaryClassifiers) {
             Double proba = binaryClassifier.predict_proba(test);
             if (proba > maxProba) {
                 maxProba = proba;
-                predictedLabel = i;
+                predictedLabel = index;
             }
+            index++;
         }
         return predictedLabel;
     }
