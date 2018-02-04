@@ -124,25 +124,4 @@ public class NearestNeighborScaler implements Scaler {
             setPixel.accept(position, pixel);
         }
     }
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
