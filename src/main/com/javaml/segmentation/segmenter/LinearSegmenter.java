@@ -12,12 +12,10 @@ import com.javaml.segmentation.garbageFilter.WeightGarbageFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class LinearSegmenter implements Segmenter {
     public enum BackgroundFetchStrategy {FIRST, MODE};
-    private enum Axis {X, Y};
 
     private BackgroundFetcher fetcher;
     private GarbageFilter filter;
@@ -51,8 +49,8 @@ public class LinearSegmenter implements Segmenter {
 
         Character background = fetcher.fetchBackground(image);
 
-        List<Integer> horizontalLines = fetchLines(image, background, Axis.Y);
-        List<Integer> verticalLines = fetchLines(image, background, Axis.X);
+        List<Integer> horizontalLines = fetchLines(image, background, AsciiImage.Axis.Y);
+        List<Integer> verticalLines = fetchLines(image, background, AsciiImage.Axis.X);
 
         for(int x = 0; x < verticalLines.size(); x++) {
             for(int y = 0; y < horizontalLines.size(); y++) {
@@ -67,11 +65,11 @@ public class LinearSegmenter implements Segmenter {
         return filter.filter(result);
     }
 
-    private List<Integer> fetchLines(AsciiImage image, Character background, Axis axis) {
+    private List<Integer> fetchLines(AsciiImage image, Character background, AsciiImage.Axis axis) {
         List<Integer> result = new ArrayList<>();
 
         Integer cursor = 0;
-        Integer end = (axis == Axis.X) ? image.getWidth() : image.getHeight();
+        Integer end = (axis == AsciiImage.Axis.X) ? image.getWidth() : image.getHeight();
 
         Integer beginGap;
 
@@ -86,11 +84,11 @@ public class LinearSegmenter implements Segmenter {
         return result;
     }
 
-    private Boolean checkLine(AsciiImage image, Integer index, Axis axis, Character background) {
+    private Boolean checkLine(AsciiImage image, Integer index, AsciiImage.Axis axis, Character background) {
         Function<Integer, Character> getPixel = (Integer pos) ->
-                axis == Axis.X ? image.getPixel(index, pos) : image.getPixel(pos, index);
+                axis == AsciiImage.Axis.X ? image.getPixel(index, pos) : image.getPixel(pos, index);
 
-        Integer end = (axis == Axis.X) ? image.getHeight() : image.getWidth();
+        Integer end = (axis == AsciiImage.Axis.X) ? image.getHeight() : image.getWidth();
 
         for(int position = 0; position < end; position++) {
             if(getPixel.apply(position) != background) {
