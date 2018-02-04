@@ -27,7 +27,8 @@ class Main {
 
             System.out.println(asciiImage);
 
-            AsciiImage scaledImage = asciiImage.getScaled(14,14);
+            AsciiImage scaledImage = asciiImage.getScaled(128, 128);
+            System.out.println("New size: " + scaledImage.getWidth() + " x " + scaledImage.getHeight());
             System.out.println(scaledImage);
 
             /*

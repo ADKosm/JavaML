@@ -20,6 +20,42 @@ public class NearestNeighborScaler implements Scaler {
     }
 
     private AsciiImage upscale(AsciiImage image, Integer newSize, AsciiImage.Axis axis) {
+        Function<Double, Double> log1_5 = (Double x) -> Math.log(x) / Math.log(1.5);
+
+        Double originalSize = ((axis == AsciiImage.Axis.X) ? image.getWidth() : image.getHeight()).doubleValue();
+        Double finalSize = newSize.doubleValue();
+
+        Integer doubling = log1_5.apply(finalSize / originalSize).intValue();
+
+        AsciiImage result = image;
+        for(int i = 0; i < doubling; i++) {
+            Integer currentSize = (axis == AsciiImage.Axis.X) ? result.getWidth() : result.getHeight();
+            result = upscale_(result, currentSize + currentSize/2, axis);
+        }
+        result = upscale_(result, newSize, axis);
+
+        return result;
+    }
+
+    private AsciiImage downscale(AsciiImage image, Integer newSize, AsciiImage.Axis axis) {
+        Function<Double, Double> log2 = (Double x) -> Math.log(x) / Math.log(2.0);
+
+        Double originalSize = ((axis == AsciiImage.Axis.X) ? image.getWidth() : image.getHeight()).doubleValue();
+        Double finalSize = newSize.doubleValue();
+
+        Integer halfing = log2.apply(originalSize / finalSize).intValue();
+
+        AsciiImage result = image;
+        for(int i = 0; i < halfing; i++) {
+            Integer currentSize = (axis == AsciiImage.Axis.X) ? result.getWidth() : result.getHeight();
+            result = downscale_(result, (currentSize+1) / 2, axis);
+        }
+        result = downscale_(result, newSize, axis);
+
+        return result;
+    }
+
+    private AsciiImage upscale_(AsciiImage image, Integer newSize, AsciiImage.Axis axis) {
         Integer originalSize = (axis == AsciiImage.Axis.X) ? image.getWidth() : image.getHeight();
 
         if(originalSize.equals(newSize)) return image;
@@ -47,7 +83,7 @@ public class NearestNeighborScaler implements Scaler {
         return result;
     }
 
-    private AsciiImage downscale(AsciiImage image, Integer newSize, AsciiImage.Axis axis) {
+    private AsciiImage downscale_(AsciiImage image, Integer newSize, AsciiImage.Axis axis) {
         Integer originalSize = (axis == AsciiImage.Axis.X) ? image.getWidth() : image.getHeight();
 
         if(originalSize.equals(newSize)) return image;
