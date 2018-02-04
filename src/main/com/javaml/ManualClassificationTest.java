@@ -38,12 +38,16 @@ class ManualClassificationTest {
                 }
             }
         }
+        long start_time = System.nanoTime();
 
         System.out.println(String.format("Training"));
         NaryClassifier c = new LogisticNaryClassifier(100, 0.7, 10);
 
         c.fit(train, labels);
-        System.out.println(String.format("Trained"));
+
+        long end_time = System.nanoTime();
+        double difference = (end_time - start_time) / 1e6;
+        System.out.println(String.format("Training took %s units of time", difference));
 
         int correct = 0;
         for (int i = 0; i < test.size(); i++) {
