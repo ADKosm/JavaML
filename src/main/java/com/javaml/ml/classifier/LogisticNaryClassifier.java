@@ -38,7 +38,7 @@ public class LogisticNaryClassifier implements NaryClassifier {
             binaryClassifier.fit(train, booleanLabels);
             return binaryClassifier;
         };
-        ThreadPool threadPool = new ThreadPool(2);
+        ThreadPool threadPool = new ThreadPool();
         binaryClassifiers = threadPool.parallelMap(learnClassicier,
                 IntStream.range(0, numberOfLabels).boxed().collect(Collectors.toList()));
     }
