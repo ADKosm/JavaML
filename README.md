@@ -1,6 +1,17 @@
 # JavaML
 To run program:
 
-`./gradlew build`
+`./gradlew runMain -PappArgs="['help']"`
 
-`java -cp build/libs/javaml-1.0-SNAPSHOT.jar com.javaml.Main`
+Ссылка path/to/train должна вести в директорию, содержащую папки с названиями от 0 до N - 1, где N — количество категорий. В папке с номером i должны находиться образцы i-того класса, использующиеся для обучения.
+
+Для тех, кто только погружается в чудесный мир машинного обучения и компьютерного зрения, мы собрали ссылки на некоторые датасеты для задачи классификации. На каждом из этих датасетов можно проверить работоспособность реализованного алгоритма многоклассовой классификации:
+
+https://www.kaggle.com/scolianni/mnistasjpg/data MNIST dataset in jpg format
+
+https://www.cs.toronto.edu/~kriz/cifar.html CIFAR-10 and CIFAR-100
+
+http://image-net.org/download ImageNet
+
+Для проверки работы segment и распознавания нескольких цифр на плакате можете использовать следующую каринку:
+[Ссылка на картинку](https://vk.com/doc122882858_459319066?hash=e3772c0c5aae7202e5&dl=20e294bdb778430279)

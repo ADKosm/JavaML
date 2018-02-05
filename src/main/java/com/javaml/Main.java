@@ -74,7 +74,7 @@ class Main {
         builder.append("    javaml predict path/to/train path/to/image | Predict numbers on image\n");
         builder.append("    javaml validate /path/to/train | Validate model\n");
         builder.append("\n");
-        builder.append("NB: path/to/train consists of subdirectories 0, 1, ..., 9 with corresponded images\n");
+        builder.append("NB: path/to/train consists of subdirectories 0, 1, ..., N with corresponded images");
         System.out.println(builder);
     }
 
