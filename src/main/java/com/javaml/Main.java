@@ -6,25 +6,19 @@ import com.javaml.converting.converter.ImageConverter;
 import com.javaml.converting.converter.SimpleImageConverter;
 import com.javaml.image.AsciiImage;
 import com.javaml.ml.Tensor;
-import com.javaml.ml.classifier.BinaryClassifier;
-import com.javaml.ml.classifier.LogisticBinaryClassifier;
 import com.javaml.ml.classifier.LogisticNaryClassifier;
 import com.javaml.ml.classifier.NaryClassifier;
-import com.javaml.segmentation.backgroundFetcher.BackgroundFetcher;
-import com.javaml.segmentation.backgroundFetcher.FirstBackgroundFetcher;
 import com.javaml.segmentation.segmenter.LinearSegmenter;
 import com.javaml.segmentation.segmenter.Segmenter;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 class Main {
     public static void main(String[] args) {
@@ -70,12 +64,12 @@ class Main {
         }
     }
 
-    public static void printHelp() {
+    private static void printHelp() {
         StringBuilder builder = new StringBuilder();
         builder.append("Usage of this program:\n");
         builder.append("    javaml help | Print this message\n");
-        builder.append("    javaml convert path/to/image | Convert image to ascii\n");
-        builder.append("    javaml scale path/to/image width height | Convert and scale ascii image\n");
+        builder.append("    javaml convert path/to/image | convert image to ascii\n");
+        builder.append("    javaml scale path/to/image width height | convert and scale ascii image\n");
         builder.append("    javaml segment path/to/image | Segmentate numbers on image\n");
         builder.append("    javaml predict path/to/train path/to/image | Predict numbers on image\n");
         builder.append("    javaml validate /path/to/train | Validate model\n");
@@ -84,30 +78,30 @@ class Main {
         System.out.println(builder);
     }
 
-    public static void convertImage(String path) throws Exception {
+    private static void convertImage(String path) throws Exception {
         BufferedImage image = ImageIO.read(new File(path));
         ImageConverter converter = new SimpleImageConverter(image.getHeight(), image.getWidth());
 
-        AsciiImage asciiImage = converter.Convert(image);
+        AsciiImage asciiImage = converter.convert(image);
 
         System.out.println(asciiImage);
     }
 
-    public static void scaleImage(String path, Integer width, Integer height) throws Exception {
+    private static void scaleImage(String path, Integer width, Integer height) throws Exception {
         BufferedImage image = ImageIO.read(new File(path));
         ImageConverter converter = new SimpleImageConverter(image.getHeight(), image.getWidth());
 
-        AsciiImage asciiImage = converter.Convert(image);
+        AsciiImage asciiImage = converter.convert(image);
         AsciiImage scaledImage = asciiImage.getScaled(width, height);
 
         System.out.println(scaledImage);
     }
 
-    public static void segmentImage(String path) throws Exception {
+    private static void segmentImage(String path) throws Exception {
         BufferedImage image = ImageIO.read(new File(path));
         ImageConverter converter = new SimpleImageConverter(image.getHeight(), image.getWidth());
 
-        AsciiImage asciiImage = converter.Convert(image);
+        AsciiImage asciiImage = converter.convert(image);
         Segmenter segmenter = new LinearSegmenter(LinearSegmenter.BackgroundFetchStrategy.FIRST);
         List<AsciiImage> images = segmenter.segment(asciiImage);
 
@@ -117,18 +111,19 @@ class Main {
         }
     }
 
-    public static void predictNumber(String pathToTrain, String pathToImage) throws Exception{
+    private static void predictNumber(String pathToTrain, String pathToImage) throws Exception{
         List<Tensor<Number>> train = new ArrayList<>();
         List<Integer> labels = new ArrayList<>();
 
         for(int i = 0; i < 10; i++) {
-            File folder = new File(pathToTrain + "/" + i);
+            Path fullPathToTrain = Paths.get(pathToTrain, String.valueOf(i));
+            File folder = new File(fullPathToTrain.toString());
 
             for(final File file : folder.listFiles()) {
                 BufferedImage image = ImageIO.read(file);
                 ImageConverter converter = new SimpleImageConverter(28, 28);
 
-                AsciiImage asciiImage = converter.Convert(image);
+                AsciiImage asciiImage = converter.convert(image);
                 train.add(asciiImage);
                 labels.add(i);
             }
@@ -143,7 +138,7 @@ class Main {
 
         BufferedImage image = ImageIO.read(new File(pathToImage));
         ImageConverter converter = new SimpleImageConverter(image.getHeight(), image.getWidth());
-        AsciiImage asciiImage = converter.Convert(image);
+        AsciiImage asciiImage = converter.convert(image);
 
         Segmenter segmenter = new LinearSegmenter(LinearSegmenter.BackgroundFetchStrategy.FIRST);
         List<AsciiImage> images = segmenter.segment(asciiImage);
@@ -157,20 +152,22 @@ class Main {
         System.out.println("Numbers: " + answers);
     }
 
-    public static void validate(String pathToTrain) throws Exception {
+    private static void validate(String pathToTrain) throws Exception {
         List<Tensor<Number>> train = new ArrayList<>();
         List<Integer> labels = new ArrayList<>();
         List<Tensor<Number>> test = new ArrayList<>();
         List<Integer> testLabels = new ArrayList<>();
         int k = 0;
         for (int i = 0; i < 10; i++) {
-            File folder = new File(pathToTrain + "/" + i);
+
+            Path fullPathToTrain = Paths.get(pathToTrain, String.valueOf(i));
+            File folder = new File(fullPathToTrain.toString());
 
             for (final File file : folder.listFiles()) {
                 BufferedImage image = ImageIO.read(file);
                 ImageConverter converter = new SimpleImageConverter(28, 28);
 
-                AsciiImage asciiImage = converter.Convert(image);
+                AsciiImage asciiImage = converter.convert(image);
                 k++;
                 if (k % 10 != 0) {
                     train.add(asciiImage);

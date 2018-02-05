@@ -16,7 +16,7 @@ public class WeightGarbageFilter extends GarbageFilter{
     @Override
     public Boolean checkImage(AsciiImage image) {
         Integer sum = 0;
-        String palette = String.valueOf(AsciiImage.C_Palette);
+        String palette = String.valueOf(AsciiImage.defaultPalette);
         for(int x = 0; x < image.getWidth(); x++) {
             for(int y = 0; y < image.getHeight(); y++) {
                 Character pixel = image.getPixel(x, y);
