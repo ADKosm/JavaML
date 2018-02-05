@@ -1,0 +1,23 @@
+group 'com.javaml'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'application'
+
+sourceCompatibility = 1.8
+
+mainClassName = 'com.javaml.Main'
+
+repositories {
+    mavenCentral()
+}
+
+task runClassification(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+
+    main = 'com.javaml.ManualClassificationTest'
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
