@@ -1,9 +1,13 @@
 package com.javaml;
 
+import com.javaml.concurrent.CheckedFunction;
+import com.javaml.concurrent.ThreadPool;
 import com.javaml.converting.converter.ImageConverter;
 import com.javaml.converting.converter.SimpleImageConverter;
 import com.javaml.image.AsciiImage;
 import com.javaml.ml.Tensor;
+import com.javaml.ml.classifier.BinaryClassifier;
+import com.javaml.ml.classifier.LogisticBinaryClassifier;
 import com.javaml.ml.classifier.LogisticNaryClassifier;
 import com.javaml.ml.classifier.NaryClassifier;
 import com.javaml.segmentation.backgroundFetcher.BackgroundFetcher;
@@ -16,8 +20,11 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 class Main {
     public static void main(String[] args) {
@@ -138,8 +145,16 @@ class Main {
         ImageConverter converter = new SimpleImageConverter(image.getHeight(), image.getWidth());
         AsciiImage asciiImage = converter.Convert(image);
 
-        Integer answer = c.predict(asciiImage);
-        System.out.println("Number: " + answer);
+        Segmenter segmenter = new LinearSegmenter(LinearSegmenter.BackgroundFetchStrategy.FIRST);
+        List<AsciiImage> images = segmenter.segment(asciiImage);
+
+        CheckedFunction<AsciiImage, Integer> predictOneImage = (AsciiImage img) ->
+                c.predict(img.getScaled(28, 28));
+
+        ThreadPool threadPool = new ThreadPool();
+        Collection<Integer> answers = threadPool.parallelMap(predictOneImage, images);
+
+        System.out.println("Numbers: " + answers);
     }
 
     public static void validate(String pathToTrain) throws Exception {
