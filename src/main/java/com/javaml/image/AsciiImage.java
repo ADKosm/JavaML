@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class AsciiImage implements Tensor<Number> {
-    public static String C_Palette = "      ',;:clodxkO0KXNWM";
+    public static String defaultPalette = "      ',;:clodxkO0KXNWM";
     public enum Axis {X, Y};
 
     private ArrayList<ArrayList<Character>> pixels;
@@ -76,6 +76,6 @@ public class AsciiImage implements Tensor<Number> {
 
     public Number getElement(Integer ordinal) {
         Character pixel = getPixel(ordinal / height, ordinal % height);
-        return C_Palette.indexOf(pixel);
+        return defaultPalette.indexOf(pixel);
     }
 }

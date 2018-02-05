@@ -12,10 +12,12 @@ repositories {
     mavenCentral()
 }
 
-task runClassification(type: JavaExec) {
+task runMain(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
-
-    main = 'com.javaml.ManualClassificationTest'
+    if(project.hasProperty('appArgs')){
+        args = Eval.me(appArgs)
+    }
+    main = 'com.javaml.Main'
 }
 
 dependencies {

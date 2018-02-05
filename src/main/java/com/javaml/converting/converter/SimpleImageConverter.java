@@ -15,9 +15,9 @@ public class SimpleImageConverter implements ImageConverter {
         this.width = width;
     }
 
-    public AsciiImage Convert(BufferedImage bufferedImage) {
+    public AsciiImage convert(BufferedImage bufferedImage) {
         BufferedImage scaledImage = scale(bufferedImage);
-        String imagePalette = AsciiImage.C_Palette;
+        String imagePalette = AsciiImage.defaultPalette;
 
         AsciiImage asciiImage = new AsciiImage(height, width);
         for(int x = 0; x < width; x++) {
@@ -41,7 +41,7 @@ public class SimpleImageConverter implements ImageConverter {
     }
 
     private Character convertPixel(Integer pixel, String palette) {
-        Integer red = (pixel >>> 16) & 0xFF;
+        Integer red   = (pixel >>> 16) & 0xFF;
         Integer green = (pixel >>>  8) & 0xFF;
         Integer blue  = (pixel >>>  0) & 0xFF;
 
