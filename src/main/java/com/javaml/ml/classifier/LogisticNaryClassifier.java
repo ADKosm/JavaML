@@ -27,7 +27,7 @@ public class LogisticNaryClassifier implements NaryClassifier {
     }
 
     @Override
-    public void fit(List<Tensor<Number>> train, List<Integer> labels) throws TensorSizeException,
+    public void fit(List<? extends Tensor<Number>> train, List<Integer> labels) throws TensorSizeException,
             UnmatchedTensorAndLabelNumbersException, UnmatchedTensorSizesException, InterruptedException {
         CheckedFunction<Integer, BinaryClassifier> learnClassicier = (Integer i) -> {
             List<Boolean> booleanLabels = new ArrayList<>(labels.size());
@@ -60,7 +60,7 @@ public class LogisticNaryClassifier implements NaryClassifier {
     }
 
     @Override
-    public List<Integer> predict(List<Tensor<Number>> test) throws TensorSizeException, UnmatchedTensorSizesException {
+    public List<Integer> predict(List<? extends Tensor<Number>> test) throws TensorSizeException, UnmatchedTensorSizesException {
         List<Integer> res = new ArrayList<>(test.size());
         for (Tensor<Number> tensor : test) {
             res.add(predict(tensor));
