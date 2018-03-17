@@ -1,6 +1,6 @@
 package com.javaml.exception;
 
-public class UnmatchedTensorAndLabelNumbersException extends Exception {
+public class UnmatchedTensorAndLabelNumbersException extends RuntimeException {
     public UnmatchedTensorAndLabelNumbersException() {
         this("Number of tensors and number of labels are not equal.");
     }

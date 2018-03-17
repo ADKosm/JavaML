@@ -2,9 +2,6 @@ package com.javaml.ml.classifier;
 
 import com.javaml.concurrent.CheckedFunction;
 import com.javaml.concurrent.ThreadPool;
-import com.javaml.exception.TensorSizeException;
-import com.javaml.exception.UnmatchedTensorAndLabelNumbersException;
-import com.javaml.exception.UnmatchedTensorSizesException;
 import com.javaml.ml.Tensor;
 
 import java.util.ArrayList;
@@ -27,8 +24,7 @@ public class LogisticNaryClassifier implements NaryClassifier {
     }
 
     @Override
-    public void fit(List<? extends Tensor<Number>> train, List<Integer> labels) throws TensorSizeException,
-            UnmatchedTensorAndLabelNumbersException, UnmatchedTensorSizesException, InterruptedException {
+    public void fit(List<? extends Tensor<Number>> train, List<Integer> labels) {
         CheckedFunction<Integer, BinaryClassifier> learnClassicier = (Integer i) -> {
             List<Boolean> booleanLabels = new ArrayList<>(labels.size());
             for (Integer label : labels) {
@@ -39,12 +35,16 @@ public class LogisticNaryClassifier implements NaryClassifier {
             return binaryClassifier;
         };
         ThreadPool threadPool = new ThreadPool();
-        binaryClassifiers = threadPool.parallelMap(learnClassicier,
-                IntStream.range(0, numberOfLabels).boxed().collect(Collectors.toList()));
+        try {
+            binaryClassifiers = threadPool.parallelMap(learnClassicier,
+                    IntStream.range(0, numberOfLabels).boxed().collect(Collectors.toList()));
+        } catch (InterruptedException e) {
+            throw new RuntimeException("Training in separate thread failed");
+        }
     }
 
     @Override
-    public Integer predict(Tensor<Number> test) throws TensorSizeException, UnmatchedTensorSizesException {
+    public Integer predict(Tensor<Number> test) {
         Double maxProba = 0.0;
         Integer predictedLabel = 0;
         int index = 0;
@@ -60,7 +60,7 @@ public class LogisticNaryClassifier implements NaryClassifier {
     }
 
     @Override
-    public List<Integer> predict(List<? extends Tensor<Number>> test) throws TensorSizeException, UnmatchedTensorSizesException {
+    public List<Integer> predict(List<? extends Tensor<Number>> test) {
         List<Integer> res = new ArrayList<>(test.size());
         for (Tensor<Number> tensor : test) {
             res.add(predict(tensor));
