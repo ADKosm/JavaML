@@ -1,5 +1,7 @@
 package com.javaml;
 
+import com.javaml.computation.ExpressionComputator;
+import com.javaml.computation.shunting_yard.PolishComputator;
 import com.javaml.converting.converter.ImageConverter;
 import com.javaml.converting.converter.SimpleImageConverter;
 import com.javaml.converting.scaler.NearestNeighborScaler;
@@ -36,8 +38,12 @@ class Main {
         });
 
         post("/api/compute", (req, res) -> {
-            System.out.println(req.queryParams("exp"));
-            return "3";
+            String expression = req.queryParams("exp");
+
+            ExpressionComputator computator = new PolishComputator();
+            Integer result = computator.compute(expression);
+
+            return result.toString();
         });
 
         post("/api/parse", (req, res) -> {
