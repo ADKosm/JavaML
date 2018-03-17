@@ -12,71 +12,44 @@ import com.javaml.segmentation.segmenter.ExpressionSegmenter;
 import com.javaml.segmentation.segmenter.LinearSegmenter;
 import com.javaml.segmentation.segmenter.Segmenter;
 
+import static spark.Spark.*;
+
 import javax.imageio.ImageIO;
+import javax.servlet.MultipartConfigElement;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.nio.file.StandardCopyOption;
+import java.util.*;
 
 class Main {
     public static void main(String[] args) {
-        try {
-            if (args.length == 0) {
-                printHelp();
-            } else {
-                switch (args[0]) {
-                    case "help":
-                        printHelp();
-                        break;
-                    case "convert":
-                        String convertPath = args[1];
-                        convertImage(convertPath);
-                        break;
-                    case "scale":
-                        String scalePath = args[1];
-                        Integer width = Integer.valueOf(args[2]);
-                        Integer height = Integer.valueOf(args[3]);
-                        scaleImage(scalePath, width, height);
-                        break;
-                    case "segment":
-                        String segmentPath = args[1];
-                        segmentImage(segmentPath);
-                        break;
-                    case "predict":
-                        String pathToTrain = args[1];
-                        String pathToImage = args[2];
-                        predictNumber(pathToTrain, pathToImage);
-                        break;
-                    case "validate":
-                        String validatePath = args[1];
-                        validate(validatePath);
-                        break;
-                    default:
-                        printHelp();
-                        break;
-                }
-            }
-        } catch (Exception e) {
-            System.out.println("Something went wrong: " + e.toString());
-            System.exit(1);
-        }
-    }
+        staticFiles.location("/");
 
-    private static void printHelp() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("Usage of this program:\n");
-        builder.append("    javaml help | Print this message\n");
-        builder.append("    javaml convert path/to/image | convert image to ascii\n");
-        builder.append("    javaml scale path/to/image width height | convert and scale ascii image\n");
-        builder.append("    javaml segment path/to/image | Segmentate numbers on image\n");
-        builder.append("    javaml predict path/to/train path/to/image | Predict numbers on image\n");
-        builder.append("    javaml validate /path/to/train | Validate model\n");
-        builder.append("\n");
-        builder.append("NB: path/to/train consists of subdirectories 0, 1, ..., N with corresponded images");
-        System.out.println(builder);
+        get("/", (req, res) -> {
+            res.redirect("/index.html");
+            return null;
+        });
+
+        post("/api/compute", (req, res) -> {
+            System.out.println(req.queryParams("exp"));
+            return "3";
+        });
+
+        post("/api/parse", (req, res) -> {
+            req.attribute("org.eclipse.jetty.multipartConfig",
+                    new MultipartConfigElement("/temp"));
+            try (InputStream is = req.raw().getPart("uploaded_file").getInputStream()) {
+                Path tempFile = Files.createTempFile("pic", ".tmp");
+                System.out.println("Temp file : " + tempFile.toString());
+                Files.copy(is, tempFile, StandardCopyOption.REPLACE_EXISTING);
+            }
+
+            return "1 + 1";
+        });
     }
 
     private static void convertImage(String path) throws Exception {
@@ -116,20 +89,6 @@ class Main {
         List<Tensor<Number>> train = new ArrayList<>();
         List<Integer> labels = new ArrayList<>();
 
-        for(int i = 0; i < 10; i++) {
-            Path fullPathToTrain = Paths.get(pathToTrain, String.valueOf(i));
-            File folder = new File(fullPathToTrain.toString());
-
-            for(final File file : folder.listFiles()) {
-                BufferedImage image = ImageIO.read(file);
-                ImageConverter converter = new SimpleImageConverter(28, 28);
-
-                AsciiImage asciiImage = converter.convert(image);
-                train.add(asciiImage);
-                labels.add(i);
-            }
-        }
-
         NaryClassifier c = new LogisticNaryClassifier(100, 0.7, 10);
         System.out.println(String.format("Training"));
 
@@ -153,51 +112,44 @@ class Main {
         System.out.println("Numbers: " + answers);
     }
 
-    private static void validate(String pathToTrain) throws Exception {
+    private static NaryClassifier train(String pathToTrain) throws Exception {
         List<Tensor<Number>> train = new ArrayList<>();
         List<Integer> labels = new ArrayList<>();
-        List<Tensor<Number>> test = new ArrayList<>();
-        List<Integer> testLabels = new ArrayList<>();
-        int k = 0;
+        Map<Integer, String> labelMapping = new HashMap<>();
         for (int i = 0; i < 10; i++) {
+            labelMapping.put(i, String.valueOf(i));
+        }
+        labelMapping.put(10, "(");
+        labelMapping.put(11, ")");
+        labelMapping.put(12, "+");
+        labelMapping.put(13, "-");
+        labelMapping.put(14, "*");
+        labelMapping.put(15, "/");
 
-            Path fullPathToTrain = Paths.get(pathToTrain, String.valueOf(i));
-            File folder = new File(fullPathToTrain.toString());
+        for (int labelId : labelMapping.keySet()) {
+
+            Path pathToClass = Paths.get(pathToTrain, String.valueOf(labelId));
+            File folder = new File(pathToClass.toString());
 
             for (final File file : folder.listFiles()) {
                 BufferedImage image = ImageIO.read(file);
                 ImageConverter converter = new SimpleImageConverter(28, 28);
 
                 AsciiImage asciiImage = converter.convert(image);
-                k++;
-                if (k % 10 != 0) {
-                    train.add(asciiImage);
-                    labels.add(i);
-                } else {
-                    test.add(asciiImage);
-                    testLabels.add(i);
-                }
+                train.add(asciiImage);
+                labels.add(labelId);
             }
         }
-        long start_time = System.nanoTime();
 
+        long start_time = System.nanoTime();
         System.out.println(String.format("Training"));
         NaryClassifier c = new LogisticNaryClassifier(100, 0.7, 10);
-
         c.fit(train, labels);
 
         long end_time = System.nanoTime();
         double difference = (end_time - start_time) / 1e6;
         System.out.println(String.format("Training took %s units of time", difference));
 
-        int correct = 0;
-        for (int i = 0; i < test.size(); i++) {
-            Integer res = c.predict(test.get(i));
-            System.out.println(String.format("predicted category: %s, correct category: %s", res, testLabels.get(i)));
-            if (res.equals(testLabels.get(i))) {
-                correct++;
-            }
-        }
-        System.out.println(String.format("correct: %s, total: %s", correct, testLabels.size()));
+        return c;
     }
 }
