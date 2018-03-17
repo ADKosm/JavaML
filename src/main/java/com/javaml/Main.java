@@ -2,6 +2,8 @@ package com.javaml;
 
 import com.javaml.converting.converter.ImageConverter;
 import com.javaml.converting.converter.SimpleImageConverter;
+import com.javaml.converting.scaler.NearestNeighborScaler;
+import com.javaml.converting.scaler.Scaler;
 import com.javaml.image.AsciiImage;
 import com.javaml.ml.Tensor;
 import com.javaml.ml.classifier.LogisticNaryClassifier;
@@ -15,6 +17,7 @@ import javax.imageio.ImageIO;
 import javax.servlet.MultipartConfigElement;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -64,27 +67,13 @@ class Main {
         labelMapping.put(15, "/");
     }
 
-    private static void convertImage(String path) throws Exception {
-        BufferedImage image = ImageIO.read(new File(path));
-        ImageConverter converter = new SimpleImageConverter(image.getHeight(), image.getWidth());
-
-        AsciiImage asciiImage = converter.convert(image);
-
-        System.out.println(asciiImage);
-    }
-
-    private static void scaleImage(String path, Integer width, Integer height) throws Exception {
-        BufferedImage image = ImageIO.read(new File(path));
-        ImageConverter converter = new SimpleImageConverter(image.getHeight(), image.getWidth());
-
-        AsciiImage asciiImage = converter.convert(image);
-        AsciiImage scaledImage = asciiImage.getScaled(width, height);
-
-        System.out.println(scaledImage);
-    }
-
-    private static String parseExp(String pathToFile) throws Exception {
-        BufferedImage image = ImageIO.read(new File(pathToFile));
+    private static String parseExp(String pathToFile) {
+        BufferedImage image;
+        try {
+            image = ImageIO.read(new File(pathToFile));
+        } catch (IOException e) {
+            throw new RuntimeException("Can't read temp file with image");
+        }
         ImageConverter converter = new SimpleImageConverter(image.getHeight(), image.getWidth());
 
         AsciiImage asciiImage = converter.convert(image);
@@ -94,21 +83,18 @@ class Main {
         return String.join("", labels);
     }
 
-    private static List<AsciiImage> segmentImage(AsciiImage image) throws Exception {
+    private static List<AsciiImage> segmentImage(AsciiImage image) {
         Segmenter segmenter = new ExpressionSegmenter();
         return segmenter.segment(image);
     }
 
-    private static List<String> predictLabels(NaryClassifier classifier, List<AsciiImage> images) throws Exception {
-        try {
-            return classifier.predict(images)
-                    .stream()
-                    .map((x) -> labelMapping.get(x))
-                    .collect(Collectors.toList());
-        } catch (Exception e) {
-            System.out.println("Something went wrong");
-        }
-        return null;
+    private static List<String> predictLabels(NaryClassifier classifier, List<AsciiImage> images) {
+        Scaler scaler = new NearestNeighborScaler();
+        return images.stream()
+                .map((image) -> scaler.scale(image, 45, 45))
+                .map(classifier::predict)
+                .map((x) -> labelMapping.get(x))
+                .collect(Collectors.toList());
     }
 
     private static NaryClassifier train(String pathToTrain) {
@@ -124,7 +110,7 @@ class Main {
                 try {
                     image = ImageIO.read(file);
                 } catch (Exception e) {
-
+                    throw new RuntimeException("Can't read train image");
                 }
 
                 ImageConverter converter = new SimpleImageConverter(28, 28);
@@ -139,11 +125,7 @@ class Main {
         System.out.println("Training");
         NaryClassifier c = new LogisticNaryClassifier(100, 0.7, 10);
 
-        try {
-            c.fit(train, labels);
-        } catch (Exception e) {
-
-        }
+        c.fit(train, labels);
 
         long end_time = System.nanoTime();
         double difference = (end_time - start_time) / 1e6;
