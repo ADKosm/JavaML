@@ -49,17 +49,20 @@ class Main {
         post("/api/parse", (req, res) -> {
             req.attribute("org.eclipse.jetty.multipartConfig",
                     new MultipartConfigElement("/temp"));
+            Path tempFile = Files.createTempFile("pic", ".tmp");
+            System.out.println("Temp file : " + tempFile.toString());
             try (InputStream is = req.raw().getPart("uploaded_file").getInputStream()) {
-                Path tempFile = Files.createTempFile("pic", ".tmp");
-                System.out.println("Temp file : " + tempFile.toString());
                 Files.copy(is, tempFile, StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                throw new RuntimeException("Can't create temp file");
             }
 
-            return "1 + 1";
+            String exp = parseExp(tempFile.toString());
+            System.out.println(exp);
+            return exp;
         });
     }
 
-    private static NaryClassifier classifier = train("/PATH/TO/TRAIN");
     private static Map<Integer, String> labelMapping = new HashMap<>();
     static {
         for (int i = 0; i < 10; i++) {
@@ -72,6 +75,7 @@ class Main {
         labelMapping.put(14, "*");
         labelMapping.put(15, "/");
     }
+    private static NaryClassifier classifier = train("./dataset");
 
     private static String parseExp(String pathToFile) {
         BufferedImage image;
@@ -119,7 +123,7 @@ class Main {
                     throw new RuntimeException("Can't read train image");
                 }
 
-                ImageConverter converter = new SimpleImageConverter(28, 28);
+                ImageConverter converter = new SimpleImageConverter(45, 45);
 
                 AsciiImage asciiImage = converter.convert(image);
                 train.add(asciiImage);
@@ -129,7 +133,7 @@ class Main {
 
         long start_time = System.nanoTime();
         System.out.println("Training");
-        NaryClassifier c = new LogisticNaryClassifier(100, 0.7, 10);
+        NaryClassifier c = new LogisticNaryClassifier(10, 0.7, labelMapping.size());
 
         c.fit(train, labels);
 
