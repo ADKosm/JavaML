@@ -29,29 +29,26 @@ public class LogisticBinaryClassifier implements BinaryClassifier {
         return sigmoid(logit);
     }
 
-    private void checkInput(List<? extends Tensor<Number>> tensors, List<Boolean> labels)
-            throws TensorSizeException, UnmatchedTensorAndLabelNumbersException, UnmatchedTensorSizesException {
+    private void checkInput(List<? extends Tensor<Number>> tensors, List<Boolean> labels) {
         if (tensors.size() != labels.size()) {
             throw new UnmatchedTensorAndLabelNumbersException();
         }
         checkInput(tensors);
     }
 
-    private void checkInput(List<? extends Tensor<Number>> tensors)
-            throws TensorSizeException, UnmatchedTensorSizesException {
+    private void checkInput(List<? extends Tensor<Number>> tensors) {
         for (Tensor<Number> tensor : tensors) {
             checkInput(tensor);
         }
     }
 
-    private void checkInput(Tensor<Number> tensor)
-            throws TensorSizeException, UnmatchedTensorSizesException {
+    private void checkInput(Tensor<Number> tensor) {
         if (!this.tensorSize.equals(getTensorSize(tensor))) {
             throw new UnmatchedTensorSizesException();
         }
     }
 
-    private Integer getTensorSize(Tensor<Number> tensor) throws TensorSizeException {
+    private Integer getTensorSize(Tensor<Number> tensor) {
         return tensor.getShape().stream().reduce(Math::multiplyExact).orElseThrow(TensorSizeException::new);
     }
 
@@ -70,8 +67,7 @@ public class LogisticBinaryClassifier implements BinaryClassifier {
     }
 
     @Override
-    public void fit(List<? extends Tensor<Number>> train, List<Boolean> labels)
-            throws TensorSizeException, UnmatchedTensorAndLabelNumbersException, UnmatchedTensorSizesException {
+    public void fit(List<? extends Tensor<Number>> train, List<Boolean> labels) {
         this.tensorSize = getTensorSize(train.get(0));
         checkInput(train, labels);
 
@@ -93,13 +89,13 @@ public class LogisticBinaryClassifier implements BinaryClassifier {
     }
 
     @Override
-    public Boolean predict(Tensor<Number> test) throws TensorSizeException, UnmatchedTensorSizesException {
+    public Boolean predict(Tensor<Number> test) {
             checkInput(test);
             return predict_(test) > this.classificationThreshold;
     }
 
     @Override
-    public List<Boolean> predict(List<? extends Tensor<Number>> test) throws TensorSizeException, UnmatchedTensorSizesException {
+    public List<Boolean> predict(List<? extends Tensor<Number>> test) {
         checkInput(test);
         List<Boolean> res = new ArrayList<>(test.size());
         for (Tensor<Number> tensor : test) {
@@ -109,14 +105,13 @@ public class LogisticBinaryClassifier implements BinaryClassifier {
     }
 
     @Override
-    public Double predict_proba(Tensor<Number> test) throws TensorSizeException, UnmatchedTensorSizesException  {
+    public Double predict_proba(Tensor<Number> test) {
         checkInput(test);
         return predict_(test);
     }
 
     @Override
-    public List<Double> predict_proba(List<? extends Tensor<Number>> test)
-            throws TensorSizeException, UnmatchedTensorSizesException {
+    public List<Double> predict_proba(List<? extends Tensor<Number>> test) {
         checkInput(test);
         List<Double> res = new ArrayList<>(test.size());
         for (Tensor<Number> tensor : test) {
