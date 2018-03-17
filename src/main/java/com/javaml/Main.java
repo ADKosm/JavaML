@@ -8,6 +8,7 @@ import com.javaml.image.AsciiImage;
 import com.javaml.ml.Tensor;
 import com.javaml.ml.classifier.LogisticNaryClassifier;
 import com.javaml.ml.classifier.NaryClassifier;
+import com.javaml.segmentation.segmenter.ExpressionSegmenter;
 import com.javaml.segmentation.segmenter.LinearSegmenter;
 import com.javaml.segmentation.segmenter.Segmenter;
 
@@ -102,7 +103,7 @@ class Main {
         ImageConverter converter = new SimpleImageConverter(image.getHeight(), image.getWidth());
 
         AsciiImage asciiImage = converter.convert(image);
-        Segmenter segmenter = new LinearSegmenter(LinearSegmenter.BackgroundFetchStrategy.FIRST);
+        Segmenter segmenter = new ExpressionSegmenter();//LinearSegmenter(LinearSegmenter.BackgroundFetchStrategy.FIRST);
         List<AsciiImage> images = segmenter.segment(asciiImage);
 
         for(int i = 0; i < images.size(); i++) {
