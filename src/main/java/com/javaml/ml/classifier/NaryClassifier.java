@@ -8,10 +8,10 @@ import com.javaml.ml.Tensor;
 import java.util.List;
 
 public interface NaryClassifier {
-    void fit(List<Tensor<Number>> train, List<Integer> labels) throws TensorSizeException,
+    void fit(List<? extends Tensor<Number>> train, List<Integer> labels) throws TensorSizeException,
             UnmatchedTensorAndLabelNumbersException, UnmatchedTensorSizesException, InterruptedException;
 
     Integer predict(Tensor<Number> test) throws TensorSizeException, UnmatchedTensorSizesException;
 
-    List<Integer> predict(List<Tensor<Number>> test) throws TensorSizeException, UnmatchedTensorSizesException;
+    List<Integer> predict(List<? extends Tensor<Number>> test) throws TensorSizeException, UnmatchedTensorSizesException;
 }

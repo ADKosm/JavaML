@@ -29,7 +29,7 @@ public class LogisticBinaryClassifier implements BinaryClassifier {
         return sigmoid(logit);
     }
 
-    private void checkInput(List<Tensor<Number>> tensors, List<Boolean> labels)
+    private void checkInput(List<? extends Tensor<Number>> tensors, List<Boolean> labels)
             throws TensorSizeException, UnmatchedTensorAndLabelNumbersException, UnmatchedTensorSizesException {
         if (tensors.size() != labels.size()) {
             throw new UnmatchedTensorAndLabelNumbersException();
@@ -37,7 +37,7 @@ public class LogisticBinaryClassifier implements BinaryClassifier {
         checkInput(tensors);
     }
 
-    private void checkInput(List<Tensor<Number>> tensors)
+    private void checkInput(List<? extends Tensor<Number>> tensors)
             throws TensorSizeException, UnmatchedTensorSizesException {
         for (Tensor<Number> tensor : tensors) {
             checkInput(tensor);
@@ -70,7 +70,7 @@ public class LogisticBinaryClassifier implements BinaryClassifier {
     }
 
     @Override
-    public void fit(List<Tensor<Number>> train, List<Boolean> labels)
+    public void fit(List<? extends Tensor<Number>> train, List<Boolean> labels)
             throws TensorSizeException, UnmatchedTensorAndLabelNumbersException, UnmatchedTensorSizesException {
         this.tensorSize = getTensorSize(train.get(0));
         checkInput(train, labels);
@@ -99,7 +99,7 @@ public class LogisticBinaryClassifier implements BinaryClassifier {
     }
 
     @Override
-    public List<Boolean> predict(List<Tensor<Number>> test) throws TensorSizeException, UnmatchedTensorSizesException {
+    public List<Boolean> predict(List<? extends Tensor<Number>> test) throws TensorSizeException, UnmatchedTensorSizesException {
         checkInput(test);
         List<Boolean> res = new ArrayList<>(test.size());
         for (Tensor<Number> tensor : test) {
@@ -115,7 +115,7 @@ public class LogisticBinaryClassifier implements BinaryClassifier {
     }
 
     @Override
-    public List<Double> predict_proba(List<Tensor<Number>> test)
+    public List<Double> predict_proba(List<? extends Tensor<Number>> test)
             throws TensorSizeException, UnmatchedTensorSizesException {
         checkInput(test);
         List<Double> res = new ArrayList<>(test.size());
