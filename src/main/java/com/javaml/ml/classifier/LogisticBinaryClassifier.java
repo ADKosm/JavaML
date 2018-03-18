@@ -1,11 +1,19 @@
 package com.javaml.ml.classifier;
 
+import com.google.gson.Gson;
 import com.javaml.exception.TensorSizeException;
 import com.javaml.exception.UnmatchedTensorAndLabelNumbersException;
 import com.javaml.exception.UnmatchedTensorSizesException;
 import com.javaml.ml.Tensor;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.lang.reflect.Array;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -66,6 +74,10 @@ public class LogisticBinaryClassifier implements BinaryClassifier {
         this.classificationThreshold = classificationThreshold;
     }
 
+    public LogisticBinaryClassifier(String path) {
+        this.load(path);
+    }
+
     @Override
     public void fit(List<? extends Tensor<Number>> train, List<Boolean> labels) {
         this.tensorSize = getTensorSize(train.get(0));
@@ -118,5 +130,33 @@ public class LogisticBinaryClassifier implements BinaryClassifier {
             res.add(predict_proba(tensor));
         }
         return res;
+    }
+
+    @Override
+    public void dump(String path) {
+        try {
+            Gson gson = new Gson();
+            String serialized = gson.toJson(this.weights.toArray());
+
+            PrintWriter writer = new PrintWriter(path);
+            writer.print(serialized);
+            writer.close();
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException("Can't load to file");
+        }
+    }
+
+    @Override
+    public void load(String path) {
+        try {
+            Gson gson = new Gson();
+            String serialised = new String(Files.readAllBytes(Paths.get(path)));
+
+            Double[] weights = gson.fromJson(serialised, Double[].class);
+            this.weights = new ArrayList<>(Arrays.asList(weights));
+            this.tensorSize = this.weights.size();
+        } catch (IOException e) {
+            throw new RuntimeException("Can't load from file");
+        }
     }
 }

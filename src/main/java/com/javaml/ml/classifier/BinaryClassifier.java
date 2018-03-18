@@ -14,4 +14,8 @@ public interface BinaryClassifier {
     Double predict_proba(Tensor<Number> test);
 
     List<Double> predict_proba(List<? extends Tensor<Number>> test);
+
+    void dump(String path);
+
+    void load(String path);
 }
