@@ -8,6 +8,7 @@ import com.javaml.converting.scaler.NearestNeighborScaler;
 import com.javaml.converting.scaler.Scaler;
 import com.javaml.image.AsciiImage;
 import com.javaml.ml.Tensor;
+import com.javaml.ml.classifier.LogisticBinaryClassifier;
 import com.javaml.ml.classifier.LogisticNaryClassifier;
 import com.javaml.ml.classifier.NaryClassifier;
 import com.javaml.segmentation.segmenter.ExpressionSegmenter;
@@ -19,6 +20,7 @@ import javax.imageio.ImageIO;
 import javax.servlet.MultipartConfigElement;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -75,7 +77,7 @@ class Main {
         labelMapping.put(14, "*");
         labelMapping.put(15, "/");
     }
-    private static NaryClassifier classifier = train("./dataset");
+    private static NaryClassifier classifier = loadModel("./model");
 
     private static String parseExp(String pathToFile) {
         BufferedImage image;
@@ -107,6 +109,14 @@ class Main {
                 .collect(Collectors.toList());
     }
 
+    private static NaryClassifier loadModel(String pathToModel) {
+        try {
+            return new LogisticNaryClassifier(pathToModel);
+        } catch (FileNotFoundException e) {
+            return train("./dataset");
+        }
+    }
+
     private static NaryClassifier train(String pathToTrain) {
         List<Tensor<Number>> train = new ArrayList<>();
         List<Integer> labels = new ArrayList<>();
@@ -133,13 +143,15 @@ class Main {
 
         long start_time = System.nanoTime();
         System.out.println("Training");
-        NaryClassifier c = new LogisticNaryClassifier(10, 0.7, labelMapping.size());
+        NaryClassifier c = new LogisticNaryClassifier(1, 0.7, labelMapping.size());
 
         c.fit(train, labels);
 
         long end_time = System.nanoTime();
         double difference = (end_time - start_time) / 1e6;
         System.out.println(String.format("Training took %s units of time", difference));
+
+        c.dump("./model");
 
         return c;
     }

@@ -4,6 +4,11 @@ import com.javaml.concurrent.CheckedFunction;
 import com.javaml.concurrent.ThreadPool;
 import com.javaml.ml.Tensor;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -12,7 +17,7 @@ import java.util.stream.IntStream;
 
 public class LogisticNaryClassifier implements NaryClassifier {
 
-    private Collection<BinaryClassifier> binaryClassifiers;
+    private List<BinaryClassifier> binaryClassifiers;
     private Integer iterationNumber;
     private Double learningRate;
     private Integer numberOfLabels;
@@ -21,6 +26,10 @@ public class LogisticNaryClassifier implements NaryClassifier {
         this.iterationNumber = iterationNumber;
         this.learningRate = learningRate;
         this.numberOfLabels = numberOfLabels;
+    }
+
+    public LogisticNaryClassifier(String path) throws FileNotFoundException {
+        this.load(path);
     }
 
     @Override
@@ -36,8 +45,8 @@ public class LogisticNaryClassifier implements NaryClassifier {
         };
         ThreadPool threadPool = new ThreadPool();
         try {
-            binaryClassifiers = threadPool.parallelMap(learnClassicier,
-                    IntStream.range(0, numberOfLabels).boxed().collect(Collectors.toList()));
+            binaryClassifiers = new ArrayList<>(threadPool.parallelMap(learnClassicier,
+                    IntStream.range(0, numberOfLabels).boxed().collect(Collectors.toList())));
         } catch (InterruptedException e) {
             throw new RuntimeException("Training in separate thread failed");
         }
@@ -66,5 +75,32 @@ public class LogisticNaryClassifier implements NaryClassifier {
             res.add(predict(tensor));
         }
         return res;
+    }
+
+    @Override
+    public void dump(String path) {
+        try {
+            Files.createDirectories(Paths.get(path));
+            for (Integer index = 0; index < this.binaryClassifiers.size(); index++) {
+                String fullPath = Paths.get(path, index.toString()).toString();
+                this.binaryClassifiers.get(index).dump(fullPath);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Boba");
+        }
+    }
+
+    @Override
+    public void load(String path) throws FileNotFoundException {
+        this.binaryClassifiers = new ArrayList<>();
+        File folder = new File(path);
+        File[] files = folder.listFiles();
+        if(files == null) throw new FileNotFoundException(path);
+
+        Integer size = files.length;
+        for(Integer index = 0; index < size; index++) {
+            String fullPath = Paths.get(path, index.toString()).toString();
+            this.binaryClassifiers.add(new LogisticBinaryClassifier(fullPath));
+        }
     }
 }
