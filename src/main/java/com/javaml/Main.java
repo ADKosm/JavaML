@@ -4,7 +4,7 @@ import com.javaml.computation.ExpressionComputator;
 import com.javaml.computation.shunting_yard.PolishComputator;
 import com.javaml.converting.converter.ImageConverter;
 import com.javaml.converting.converter.SimpleImageConverter;
-import com.javaml.converting.scaler.NearestNeighborScaler;
+import com.javaml.converting.scaler.NearestNeighbourScaler;
 import com.javaml.converting.scaler.Scaler;
 import com.javaml.image.AsciiImage;
 import com.javaml.ml.Tensor;
@@ -101,7 +101,7 @@ class Main {
     }
 
     private static List<String> predictLabels(NaryClassifier classifier, List<AsciiImage> images) {
-        Scaler scaler = new NearestNeighborScaler();
+        Scaler scaler = new NearestNeighbourScaler();
         return images.stream()
                 .map((image) -> scaler.scale(image, 45, 45))
                 .map(classifier::predict)
