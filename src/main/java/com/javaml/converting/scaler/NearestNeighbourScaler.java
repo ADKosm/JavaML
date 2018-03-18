@@ -5,7 +5,7 @@ import com.javaml.image.AsciiImage;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-public class NearestNeighborScaler implements Scaler {
+public class NearestNeighbourScaler implements Scaler {
     @Override
     public AsciiImage scale(AsciiImage image, Integer newWidth, Integer newHeight) {
         AsciiImage result = image;

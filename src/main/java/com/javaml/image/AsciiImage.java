@@ -1,6 +1,6 @@
 package com.javaml.image;
 
-import com.javaml.converting.scaler.NearestNeighborScaler;
+import com.javaml.converting.scaler.NearestNeighbourScaler;
 import com.javaml.converting.scaler.Scaler;
 import com.javaml.ml.Tensor;
 
@@ -44,7 +44,7 @@ public class AsciiImage implements Tensor<Number> {
     }
 
     public AsciiImage getScaled(Integer newWidth, Integer newHeight) {
-        Scaler scaler = new NearestNeighborScaler();  // TODO: make scale strategy parametrized
+        Scaler scaler = new NearestNeighbourScaler();  // TODO: make scale strategy parametrized
         return scaler.scale(this, newWidth, newHeight);
     }
 
