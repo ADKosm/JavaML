@@ -21,8 +21,10 @@ task runMain(type: JavaExec) {
 }
 
 task downloadData {
-    "wget http://kosmose.me/data/cvc/dataset.tar.gz".execute().waitFor()
-    "tar -xzf dataset.tar.gz".execute().waitFor()
+    if (! new File('dataset').exists()) {
+        "wget http://kosmose.me/data/cvc/dataset.tar.gz".execute().waitFor()
+        "tar -xzf dataset.tar.gz".execute().waitFor()
+    }
 }
 
 runMain.dependsOn downloadData
