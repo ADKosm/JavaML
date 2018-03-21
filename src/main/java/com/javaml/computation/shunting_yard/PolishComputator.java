@@ -9,7 +9,9 @@ import java.util.function.BinaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
+/**
+ * Implementation of computator based on Shunting Yard algorithm
+ */
 public class PolishComputator implements ExpressionComputator {
     Pattern symbolPattern;
     Stack<String> result;

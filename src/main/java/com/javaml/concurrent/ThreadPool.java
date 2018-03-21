@@ -20,6 +20,15 @@ public class ThreadPool {
         this.threadNum = threadNum;
     }
 
+    /**
+     * Concurrently apply function to each element of data
+     * @param function - function to apply
+     * @param data - collection of elements
+     * @param <T>
+     * @param <R>
+     * @return collection with mapped elements
+     * @throws InterruptedException
+     */
      public <T, R> Collection<R> parallelMap(CheckedFunction<T, R> function, Collection<T> data) throws InterruptedException {
         List<ThreadedMap<T, R>> threadedMaps = new ArrayList<>(threadNum);
         Integer batchSize = data.size() / threadNum;

@@ -29,6 +29,11 @@ public class SimpleImageConverter implements ImageConverter {
         return asciiImage;
     }
 
+    /**
+     * Scale original image to submitted size
+     * @param bufferedImage
+     * @return
+     */
     private BufferedImage scale(BufferedImage bufferedImage) {
         Image scaledImage = bufferedImage.getScaledInstance(width, height, Image.SCALE_SMOOTH);
         BufferedImage resultImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
@@ -40,6 +45,12 @@ public class SimpleImageConverter implements ImageConverter {
         return resultImage;
     }
 
+    /**
+     * Transform real pixel into ascii symbol
+     * @param pixel
+     * @param palette
+     * @return
+     */
     private Character convertPixel(Integer pixel, String palette) {
         Integer red   = (pixel >>> 16) & 0xFF;
         Integer green = (pixel >>>  8) & 0xFF;

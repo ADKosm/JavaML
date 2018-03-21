@@ -24,6 +24,12 @@ public class PolishTranslator {
         priority.put("/", 2);
     }
 
+
+    /**
+     * Convert natural notation into polish notation
+     * @param expression
+     * @return string with polish notation
+     */
     public String translate(String expression) {
         Matcher m = symbolPattern.matcher(expression);
         StringBuilder result = new StringBuilder();
