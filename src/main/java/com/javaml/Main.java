@@ -143,7 +143,7 @@ class Main {
 
         long start_time = System.nanoTime();
         System.out.println("Training");
-        NaryClassifier c = new LogisticNaryClassifier(1, 0.7, labelMapping.size());
+        NaryClassifier c = new LogisticNaryClassifier(150, 0.7, labelMapping.size());
 
         c.fit(train, labels);
 
