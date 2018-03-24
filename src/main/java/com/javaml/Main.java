@@ -63,6 +63,8 @@ class Main {
             System.out.println(exp);
             return exp;
         });
+
+        System.out.println("Start server at http://localhost:4567");
     }
 
     private static Map<Integer, String> labelMapping = new HashMap<>();
